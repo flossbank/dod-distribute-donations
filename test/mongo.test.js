@@ -16,8 +16,8 @@ test.before(async (t) => {
     kms: {}
   })
 
-  const mongo = new MongoMemoryServer()
-  const mongoUri = await mongo.getUri()
+  const mongo = await MongoMemoryServer.create()
+  const mongoUri = mongo.getUri()
 
   config.decrypt = sinon.stub().returns(mongoUri)
   t.context.mongo = new Mongo({ config, log: { info: sinon.stub() } })
@@ -64,63 +64,6 @@ test('close', async (t) => {
   await mongo.close()
 
   t.true(mongo.mongoClient.close.calledOnce)
-})
-
-test('get package', async (t) => {
-  const { mongo, packageId2 } = t.context
-
-  const pkg = await mongo.getPackage({ packageId: packageId2 })
-  t.deepEqual(pkg, {
-    name: 'tulips',
-    language: 'javascript',
-    registry: 'npm'
-  })
-})
-
-test('get package | no pkg', async (t) => {
-  const { mongo } = t.context
-
-  const pkg = await mongo.getPackage({ packageId: 'aaaaaaaaaaaa' })
-  t.is(pkg, null)
-})
-
-test('get org', async (t) => {
-  const { mongo } = t.context
-  const { insertedId: orgId1 } = await mongo.db.collection('organizations').insertOne({
-    name: 'flossbank',
-    installationId: 'abc',
-    host: 'GitHub'
-  })
-
-  const res = await mongo.getOrg({ organizationId: orgId1.toString() })
-  t.deepEqual(res, { name: 'flossbank', host: 'GitHub', installationId: 'abc' })
-})
-
-test('get org | no org', async (t) => {
-  const { mongo } = t.context
-  const res = await mongo.getOrg({ organizationId: 'aaaaaaaaaaaa' })
-  t.is(res, null)
-})
-
-test('get no comp list | supported', async (t) => {
-  const { mongo } = t.context
-
-  await mongo.db.collection('meta').insertOne({
-    language: 'javascript',
-    registry: 'npm',
-    name: 'noCompList',
-    list: ['react']
-  })
-
-  const res = await mongo.getNoCompList({ language: 'javascript', registry: 'npm' })
-  t.deepEqual(res, new Set(['react']))
-})
-
-test('get no comp list | unsupported', async (t) => {
-  const { mongo } = t.context
-
-  const res = await mongo.getNoCompList({ language: 'python', registry: 'pypi' })
-  t.deepEqual(res, new Set())
 })
 
 test('increment org total amount donated from undefined', async (t) => {
