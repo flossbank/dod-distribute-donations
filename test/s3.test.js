@@ -41,7 +41,7 @@ test.beforeEach((t) => {
 test('getInitialState | success', async (t) => {
   const initialState = await t.context.s3.getInitialState({ correlationId: 'test-org-id' })
   t.true(t.context.s3.s3.getObject.calledWith({
-    Bucket: 'org_donation_state',
+    Bucket: 'org-donation-state',
     Key: 'test-org-id/initial_state.json'
   }))
   t.deepEqual(initialState, {
@@ -110,4 +110,32 @@ test('getPackageWeightMapForSupportedLangs | one s3 request failed', async (t) =
     ],
     correlationId: 'asdf'
   }))
+})
+
+test('getTopLevelDepsCount', async (t) => {
+  const { s3 } = t.context
+  const searchPatterns = [
+    {
+      language: 'javascript',
+      registry: 'npm',
+      patterns: []
+    },
+    {
+      language: 'ruby',
+      registry: 'rubygems',
+      patterns: []
+    }
+  ]
+  s3.s3.getObject().promise
+    .onFirstCall()
+    .resolves({
+      Body: JSON.stringify(['standard', 'js-deep-equals'])
+    })
+    .onSecondCall()
+    .resolves({
+      Body: JSON.stringify(['json', 'json-thing'])
+    })
+  const count = await s3.getTopLevelDepsCount({ correlationId: 'asdf', searchPatterns })
+
+  t.is(count, 4)
 })
