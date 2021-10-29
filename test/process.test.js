@@ -13,7 +13,7 @@ test.beforeEach((t) => {
     distributeOrgDonation: sinon.stub(),
     updateDonatedAmount: sinon.stub(),
     createOrganizationOssUsageSnapshot: sinon.stub(),
-    decrimentManuallyBilledOrgRemainingDonation: sinon.stub()
+    decrementManuallyBilledOrgRemainingDonation: sinon.stub()
   }
   t.context.packageWeightMaps = [
     {
@@ -173,7 +173,7 @@ test('process | success | manually billed org updates remaining donation amount 
 
   t.deepEqual(res, { success: true })
   t.true(services.db.updateDonatedAmount.calledWith({ organizationId: 'test-org-id', amount: manuallyBilledInitialState.amount }))
-  t.true(services.db.decrimentManuallyBilledOrgRemainingDonation.calledWith({ organizationId: 'test-org-id', amount: 1000000 }))
+  t.true(services.db.decrementManuallyBilledOrgRemainingDonation.calledWith({ organizationId: 'test-org-id', amount: 1000000 }))
 })
 
 test('process | success | manually billed org updates remaining donation amount -> still remaining donation', async (t) => {
@@ -186,7 +186,7 @@ test('process | success | manually billed org updates remaining donation amount 
 
   t.deepEqual(res, { success: true })
   t.true(services.db.updateDonatedAmount.calledWith({ organizationId: 'test-org-id', amount: manuallyBilledInitialState.amount }))
-  t.true(services.db.decrimentManuallyBilledOrgRemainingDonation.calledWith({ organizationId: 'test-org-id', amount: 1000000 }))
+  t.true(services.db.decrementManuallyBilledOrgRemainingDonation.calledWith({ organizationId: 'test-org-id', amount: 1000000 }))
 })
 
 test('process | targetPackageId | success', async (t) => {

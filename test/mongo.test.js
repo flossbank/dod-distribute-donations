@@ -97,7 +97,7 @@ test('increment org total amount donated from existing value', async (t) => {
   t.deepEqual(updatedOrg.totalDonated, 2000)
 })
 
-test('decriment manually billed org remaining donation', async (t) => {
+test('decrement manually billed org remaining donation', async (t) => {
   const { mongo } = t.context
 
   const { insertedId: orgId1 } = await mongo.db.collection('organizations').insertOne({
@@ -109,7 +109,7 @@ test('decriment manually billed org remaining donation', async (t) => {
     remainingDonation: 1000
   })
 
-  await mongo.decrimentManuallyBilledOrgRemainingDonation({ organizationId: orgId1.toString(), amount: 1000 })
+  await mongo.decrementManuallyBilledOrgRemainingDonation({ organizationId: orgId1.toString(), amount: 1000 })
 
   const updatedOrg = await mongo.db.collection('organizations').findOne({ _id: orgId1 })
   t.deepEqual(updatedOrg.remainingDonation, 0)
