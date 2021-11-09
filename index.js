@@ -7,7 +7,7 @@ const Db = require('./lib/mongo')
 const S3 = require('./lib/s3')
 
 const kms = new AWS.KMS({ region: 'us-west-2' })
-const s3 = new AWS.S3({ apiVersion: '2006-03-01' })
+const awsS3 = new AWS.S3({ apiVersion: '2006-03-01' })
 
 /*
 - Gets package weights map from s3
@@ -17,8 +17,8 @@ const s3 = new AWS.S3({ apiVersion: '2006-03-01' })
 */
 exports.handler = async (event) => {
   const log = Pino()
-  const awsS3 = new S3({ s3 })
   const config = new Config({ log, kms })
+  const s3 = new S3({ s3: awsS3, config })
 
   const db = new Db({ log, config })
   await db.connect()
@@ -28,7 +28,7 @@ exports.handler = async (event) => {
   let results
   try {
     results = await Promise.all(
-      event.Records.map(record => Process.process({ record, db, resolver, log, s3: awsS3 }))
+      event.Records.map(record => Process.process({ record, db, resolver, log, s3 }))
     )
     if (!results.every(result => result.success)) {
       throw new Error(JSON.stringify(results))

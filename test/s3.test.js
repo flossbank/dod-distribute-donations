@@ -34,6 +34,9 @@ test.beforeEach((t) => {
           })
         })
       })
+    },
+    config: {
+      getBucketName: sinon.stub().returns('org-donation-state')
     }
   })
 })
