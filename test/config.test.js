@@ -24,3 +24,8 @@ test('getMongoUri decrypts with kms and caches result', async (t) => {
   t.is(await config.getMongoUri(), 'abc')
   t.true(config.kms.decrypt.notCalled)
 })
+
+test('getBucketName', (t) => {
+  process.env.ORG_DONATION_STATE_BUCKET = 'abc'
+  t.is(t.context.config.getBucketName(), 'abc')
+})
